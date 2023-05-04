@@ -34,7 +34,7 @@
 /*%nonassoc '-' '!'*/
 
 
-%start expresion_potencia
+%start expresion_ctc_mas
 
 %%
 
@@ -88,7 +88,7 @@ tipo_escalar: ENTERO {printf("\n  tipo_escalar -> ENTERO");}
 
 tipo_fichero: FICHERO {printf("\n  tipo_fichero -> FICHERO");} ;
 
-tipo_enumerado: '(' expresion_constante_mas ')';
+tipo_enumerado: '(' expresion_ctc_mas ')';
 
 tipo_lista: LISTA DE tipo_no_estructurado_o_nombre_tipo
           | LISTA '[' rango_mas ']' DE tipo_no_estructurado_o_nombre_tipo
@@ -298,22 +298,36 @@ instruccion_lanzar: LANZAR nombre ';' {printf("\n  instr_lanzar -> LANZAR nom");
 /* expresiones */
 /***************/
 
-expresion_negativa: '-' CTC_ENTERA;
+expresion_negativa: '-' expresion_ctc_entera;
 
 expresion_numerica: expresion_negativa
-                  | CTC_ENTERA
-                  | CTC_REAL;
+                  | expresion_ctc_entera
+                  | expresion_ctc_real;
 
 expresion_potencia: expresion_numerica POTENCIA expresion_numerica;
 
-expresion_multiplicacion:
+expresion_multiplicacion: expresion_numerica '*' expresion_numerica;
 
-expresion_suma: expresion '+' expresion
-              | expresion_suma '+' expresion
+expresion_division: expresion_numerica '/' expresion_numerica;
+
+expresion_resta: expresion_numerica '-' expresion_numerica;
+
+expresion_suma: expresion '+' expresion;
 //              { $$ = $1 + $2; }
 ;
 
-expresion_primaria: expresion_constante
+expresion: expresion_negativa
+         | expresion_potencia
+         | expresion_multiplicacion
+         | expresion_division
+         | expresion_resta
+         | expresion_suma
+         | expresion expresion;
+
+expresion_mas: expresion
+             | expresion expresion_mas;
+
+expresion_primaria: expresion_ctc
                   | objeto
                   | llamada_subprograma
                   | '(' expresion ')'
@@ -323,17 +337,21 @@ expresion_asterisco:  expresion
                    |  expresion expresion_asterisco 
 ;
 
-expresion_constante: CTC_ENTERA | CTC_REAL | CTC_CADENA | CTC_CARACTER | CTC_BOOLEANA;
+expresion_ctc_entera: CTC_ENTERA { printf("\n expr_ctc -> CTC_ENTERA"); };
+expresion_ctc_real: CTC_REAL { printf("\n expr_ctc_real -> CTC_REAL"); };
+expresion_ctc_cadena: CTC_CADENA { printf("\n expr_ctc_cadena -> CTC_CADENA"); };
+expresion_ctc_caracter: CTC_CARACTER { printf("\n expr_ctc_caracter -> CTC_CARACTER"); };
+expresion_ctc_booleana: CTC_BOOLEANA { printf("\n expr_ctc_booleana -> CTC_BOOLEANA"); };
 
-expresion_constante_mas: expresion_constante
-                       | expresion_constante expresion_constante_mas
-;              
+expresion_ctc: expresion_ctc_entera
+             | expresion_ctc_real
+             | expresion_ctc_cadena
+             | expresion_ctc_caracter
+             | expresion_ctc_booleana;
 
-expresion: CTC_ENTERA
-         | CTC_CADENA
-         | CTC_REAL
-         | IDENTIFICADOR
-;         
+expresion_ctc_mas: expresion_ctc
+                  | expresion_ctc expresion_ctc_mas;
+
 
 objeto: nombre {printf("\n  obj -> nom"); }
       | objeto '[' expresion ']' {printf("\n  obj -> obj '[' expr ']'"); }
