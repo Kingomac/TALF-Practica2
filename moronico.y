@@ -33,8 +33,6 @@
 /** Operadores unarios no asociativos **/
 /*%nonassoc '-' '!'*/
 
-%left '+' '-' '*' '/' '%'
-%right POTENCIA
 
 %start expresion_mas
 
@@ -302,21 +300,28 @@ instruccion_lanzar: LANZAR nombre ';' {printf("\n  instr_lanzar -> LANZAR nom");
 
 expresion_negativa: '-' expresion_ctc_entera { printf("\n expr -> negativa"); };
 
+operador: '/' | '*'
+
 expresion_numerica: expresion_negativa
                   | expresion_ctc_entera
                   | expresion_ctc_real;
 
 expresion_potencia: expresion_numerica POTENCIA expresion_numerica;
 
-expresion_multiplicacion: expresion_numerica '*' expresion_numerica;
+expresion_multiplicacion: expresion_numerica '*' expresion_numerica
+                        | expresion '*' expresion_numerica;
 
-expresion_division: expresion_numerica '/' expresion_numerica;
+expresion_division: expresion_numerica '/' expresion_numerica
+                  | expresion '/' expresion_numerica;
 
-expresion_modulo: expresion_numerica '%' expresion_numerica;
+expresion_modulo: expresion_numerica '%' expresion_numerica
+                | expresion '%' expresion_numerica;
 
-expresion_resta: expresion_numerica '-' expresion_numerica;
+expresion_resta: expresion_numerica '-' expresion_numerica
+                | expresion '-' expresion_numerica;
 
-expresion_suma: expresion_numerica '+' expresion_numerica;
+expresion_suma: expresion_numerica '+' expresion_numerica
+              | expresion '+' expresion_numerica;
 
 expresion: expresion_potencia { printf("\n expr -> potencia"); } 
          | expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
@@ -325,8 +330,7 @@ expresion: expresion_potencia { printf("\n expr -> potencia"); }
          | expresion_resta { printf("\n expr -> resta"); }
          | expresion_suma { printf("\n expr -> suma"); };
 
-expresion_mas: expresion
-             | expresion expresion_mas;
+expresion_mas: expresion;
 
 expresion_asterisco:  expresion
                    |  expresion expresion_asterisco 
