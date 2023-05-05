@@ -33,12 +33,10 @@
 /** Operadores unarios no asociativos **/
 /*%nonassoc '-' '!'*/
 
+%left '+' '-' '*' '/' '%'
+%right POTENCIA
 
-%left '+' '-'
-%left '*' '/'
-%right '%' POTENCIA
-
-%start expresion
+%start expresion_mas
 
 %%
 
@@ -302,7 +300,7 @@ instruccion_lanzar: LANZAR nombre ';' {printf("\n  instr_lanzar -> LANZAR nom");
 /* expresiones */
 /***************/
 
-expresion_negativa: '-' expresion_ctc_entera;
+expresion_negativa: '-' expresion_ctc_entera { printf("\n expr -> negativa"); };
 
 expresion_numerica: expresion_negativa
                   | expresion_ctc_entera
@@ -320,14 +318,12 @@ expresion_resta: expresion_numerica '-' expresion_numerica;
 
 expresion_suma: expresion_numerica '+' expresion_numerica;
 
-expresion: expresion_negativa { printf("\n expr -> negativa"); }
-         | expresion_potencia { printf("\n expr -> potencia"); } 
+expresion: expresion_potencia { printf("\n expr -> potencia"); } 
          | expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
          | expresion_division { printf("\n expr -> division"); }
          | expresion_modulo { printf("\n expr -> modulo"); }
          | expresion_resta { printf("\n expr -> resta"); }
-         | expresion_suma { printf("\n expr -> suma"); }
-         | expresion expresion;
+         | expresion_suma { printf("\n expr -> suma"); };
 
 expresion_mas: expresion
              | expresion expresion_mas;
