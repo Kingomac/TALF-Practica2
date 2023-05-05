@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include "moronico.h"
+#include "moronico.tab.h"
 
 int linea = 1;
 %}

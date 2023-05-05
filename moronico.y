@@ -34,7 +34,7 @@
 /*%nonassoc '-' '!'*/
 
 
-%start expresion_mas
+%start expresion
 
 %%
 
@@ -300,13 +300,13 @@ instruccion_lanzar: LANZAR nombre ';' {printf("\n  instr_lanzar -> LANZAR nom");
 
 expresion_negativa: '-' expresion_ctc_entera { printf("\n expr -> negativa"); };
 
-operador: '/' | '*'
+expresion_potencia: expresion_numerica POTENCIA expresion_ctc_entera { printf("\n expr -> potencia"); }
+                  | expresion_numerica POTENCIA expresion_ctc_real { printf("\n expr -> potencia"); };
 
 expresion_numerica: expresion_negativa
+                  | expresion_potencia
                   | expresion_ctc_entera
                   | expresion_ctc_real;
-
-expresion_potencia: expresion_numerica POTENCIA expresion_numerica;
 
 expresion_multiplicacion: expresion_numerica '*' expresion_numerica
                         | expresion '*' expresion_numerica;
@@ -323,18 +323,17 @@ expresion_resta: expresion_numerica '-' expresion_numerica
 expresion_suma: expresion_numerica '+' expresion_numerica
               | expresion '+' expresion_numerica;
 
-expresion: expresion_potencia { printf("\n expr -> potencia"); } 
-         | expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
+expresion: expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
          | expresion_division { printf("\n expr -> division"); }
          | expresion_modulo { printf("\n expr -> modulo"); }
          | expresion_resta { printf("\n expr -> resta"); }
          | expresion_suma { printf("\n expr -> suma"); };
 
-expresion_mas: expresion;
+expresion_lista: expresion
+               | expresion_lista expresion;
 
-expresion_asterisco:  expresion
-                   |  expresion expresion_asterisco 
-;
+expresion_asterisco: expresion
+                   | expresion expresion_asterisco;
 
 expresion_ctc_entera: CTC_ENTERA { printf("\n expr_ctc -> CTC_ENTERA"); };
 expresion_ctc_real: CTC_REAL { printf("\n expr_ctc_real -> CTC_REAL"); };
@@ -354,14 +353,12 @@ expresion_ctc_mas: expresion_ctc
 expresion_primaria: expresion_ctc
                   | objeto
                   | llamada_subprograma
-                  | '(' expresion ')'
-;
+                  | '(' expresion ')';
 
 
 objeto: nombre {printf("\n  obj -> nom"); }
-      | objeto '[' expresion ']' {printf("\n  obj -> obj '[' expr ']'"); }
-      | objeto '.' IDENTIFICADOR {printf("\n  obj -> obj '.' IDENTIFICADOR"); }
-;
+      | objeto expresion_lista {printf("\n  obj -> obj '[' expr ']'"); }
+      | objeto '.' IDENTIFICADOR {printf("\n  obj -> obj '.' IDENTIFICADOR"); };
 
 %%
 
