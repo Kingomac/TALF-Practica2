@@ -34,7 +34,8 @@
 /*%nonassoc '-' '!'*/
 
 
-%start expresion
+
+%start instruccion_asignacion
 
 %%
 
@@ -329,8 +330,12 @@ expresion: expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
          | expresion_resta { printf("\n expr -> resta"); }
          | expresion_suma { printf("\n expr -> suma"); };
 
+/*expresion_mas: expresion
+             | expresion expresion_mas ;
+*/
+
 expresion_lista: expresion
-               | expresion_lista expresion;
+               | expresion ',' expresion_lista; 
 
 expresion_asterisco: expresion
                    | expresion expresion_asterisco;
@@ -357,7 +362,7 @@ expresion_primaria: expresion_ctc
 
 
 objeto: nombre {printf("\n  obj -> nom"); }
-      | objeto expresion_lista {printf("\n  obj -> obj '[' expr ']'"); }
+      | objeto '[' expresion_lista ']' {printf("\n  obj -> obj '[' expr ']'"); }
       | objeto '.' IDENTIFICADOR {printf("\n  obj -> obj '.' IDENTIFICADOR"); };
 
 %%
