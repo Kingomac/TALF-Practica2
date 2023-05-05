@@ -29,12 +29,16 @@
 %token SEMIPUBLICO SI SINO TIPO VARIABLE
 
 /** Operadores asociativos por la izquierda **/
-/*%right OR AND POTENCIA*/
+/*%right OR AND POTENCIA*/ 
 /** Operadores unarios no asociativos **/
 /*%nonassoc '-' '!'*/
 
 
-%start expresion_ctc_mas
+%left '+' '-'
+%left '*' '/'
+%right '%' POTENCIA
+
+%start expresion
 
 %%
 
@@ -310,28 +314,23 @@ expresion_multiplicacion: expresion_numerica '*' expresion_numerica;
 
 expresion_division: expresion_numerica '/' expresion_numerica;
 
+expresion_modulo: expresion_numerica '%' expresion_numerica;
+
 expresion_resta: expresion_numerica '-' expresion_numerica;
 
-expresion_suma: expresion '+' expresion;
-//              { $$ = $1 + $2; }
-;
+expresion_suma: expresion_numerica '+' expresion_numerica;
 
-expresion: expresion_negativa
-         | expresion_potencia
-         | expresion_multiplicacion
-         | expresion_division
-         | expresion_resta
-         | expresion_suma
+expresion: expresion_negativa { printf("\n expr -> negativa"); }
+         | expresion_potencia { printf("\n expr -> potencia"); } 
+         | expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
+         | expresion_division { printf("\n expr -> division"); }
+         | expresion_modulo { printf("\n expr -> modulo"); }
+         | expresion_resta { printf("\n expr -> resta"); }
+         | expresion_suma { printf("\n expr -> suma"); }
          | expresion expresion;
 
 expresion_mas: expresion
              | expresion expresion_mas;
-
-expresion_primaria: expresion_ctc
-                  | objeto
-                  | llamada_subprograma
-                  | '(' expresion ')'
-;
 
 expresion_asterisco:  expresion
                    |  expresion expresion_asterisco 
@@ -351,6 +350,12 @@ expresion_ctc: expresion_ctc_entera
 
 expresion_ctc_mas: expresion_ctc
                   | expresion_ctc expresion_ctc_mas;
+
+expresion_primaria: expresion_ctc
+                  | objeto
+                  | llamada_subprograma
+                  | '(' expresion ')'
+;
 
 
 objeto: nombre {printf("\n  obj -> nom"); }
