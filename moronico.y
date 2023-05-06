@@ -9,6 +9,8 @@
 
 %}
 
+%define parse.error verbose
+
 %token ABSTRACTO     AND          ASOCIATIVA  BOOLEANO 
 %token CABECERA      CADENA       CASO        CARACTER 
 %token CARGA         CLASE        CONJUNTO    CONSTANTE 
@@ -50,7 +52,8 @@
 /********************************/
 
 programa: definicion_programa
-        | definicion_paquete;
+        | definicion_paquete
+        | error { yyerrok; yyclearin; };
 
 definicion_programa: PROGRAMA nombre ';' bloque_programa;
 
@@ -364,7 +367,7 @@ instruccion_devolver: DEVOLVER ';'           {printf("\n  instruc_devolver -> DE
                     | DEVOLVER expresion ';' {printf("\n  instruc_devolver -> DEVOLVER expr ;"); };
       
 instruccion_llamada: llamada_subprograma ';' {printf("\n  instruc_llamada -> llamada_subprograma ;"); };
-llamada_subprograma: nombre '(' expresiones_asterisco ')' {printf("\n  llamamada_subprg -> nombre_declarac '(' expresiones ')' "); }; 
+llamada_subprograma: nombre '(' expresion_asterisco ')' {printf("\n  llamamada_subprg -> nombre_declarac '(' expresiones ')' "); }; 
 
 instruccion_si: SI expresion ENTONCES bloque_instrucciones                           { printf("\n  instruc_si -> SI expr ENTONCES bloque_instruc"); }
               | SI expresion ENTONCES bloque_instrucciones SINO bloque_instrucciones { printf("\n  instruc_si -> SI expr ENTONCES bloque_instruc SINO bloque_instruc"); };
@@ -434,21 +437,24 @@ expresiones_aritmeticas: expresion   '+'    expresion
 expresion: expresion_primaria
          | expresiones_logicas
          | expresiones_binarias
-         | expresiones_aritmeticas;
+         | expresiones_aritmeticas
+         | expresion_parentesis;
 
 /* +1 expresiones separadas por coma (1...N) */
 expresiones_lista: expresion                      { printf("\n  expresion -> expresion"); }
                 | expresiones_lista ',' expresion { printf("\n  expresion -> expresiones ',' expresion"); };
 
 /* número indenifido de expresiones separadas por coma (0...N) */
-expresiones_asterisco: /* cadena vacía */                  { printf("\n  expresion -> "); }
-                     | expresiones_asterisco expresion     { printf("\n  expresion -> expresion"); }
-                     | expresiones_asterisco ',' expresion { printf("\n  expresion -> expresion ',' expresion"); };
+expresion_asterisco: /* cadena vacía */                  { printf("\n  expresion -> "); }
+                     | expresion_asterisco expresion     { printf("\n  expresion -> expresion"); }
+                     | expresion_asterisco ',' expresion { printf("\n  expresion -> expresion ',' expresion"); };
+
+expresion_parentesis: '(' expresion ')';
 
 expresion_primaria: expresion_const     { printf("\n  expresion_primaria -> expresion_const"); }
                   | objeto              { printf("\n  expresion_primaria -> obj"); }
-                  | llamada_subprograma { printf("\n  expresion_primaria -> llamada_subprograma"); }
-                  | '(' expresion ')'   { printf("\n  expresion_primaria -> ( expr )"); };
+                  | llamada_subprograma { printf("\n  expresion_primaria -> llamada_subprograma"); };
+                  //| expresion_parentesis   { printf("\n  expresion_primaria -> ( expr )"); };
 
 expresion_const: CTC_ENTERA   { printf("\n  expresion_const -> CTC_ENTERA"); }
                | CTC_REAL     { printf("\n  expresion_const -> CTC_REAL"); }
