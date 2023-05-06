@@ -33,17 +33,17 @@
 /** Operadores unarios no asociativos **/
 /*%nonassoc '-' '!'*/
 
+%right AND OR
+%left LEQ GEQ NEQ EQ
+%left '^' '@'
+%left '&'
+%left '<' '>'
 %nonassoc '-'
 %left '+'
 %left '*' '/'
 %left '%'
-%left '^' '@'
-%left '&'
-%left '<' '>'
-%left LEQ GEQ NEQ
-%right AND OR
 
-%start instruccion_salir
+%start instruccion_casos
 
 %%
 
@@ -60,42 +60,38 @@ nombre_mas: nombre
 /* programas, paquetes y cargas */
 /********************************/
 
-bloque_instrucciones: '{' instruccion_mas '}' { printf("\n  blq_instrs -> '{' instrs '}'");} ;
+bloque_instrucciones: '{' instruccion_mas '}' { printf("\n   bloque_instruccion  ->  '{' instrucciones '}'");};
 
 /************************/
 /* tipos (incl. clases) */
 /************************/
 
-declaracion_tipos: TIPO declaracion_tipo_mas {printf("decl_tipos -> TIPO "); } ;  //Como termino esto??
+declaracion_tipos: TIPO declaracion_tipo_mas {printf(" declaracion_tipo  ->  TIPO "); } ;  //Como termino esto??
 
-declaracion_tipo: nombre '=' tipo_no_estructurado_o_nombre_tipo ';' {printf("\n  decl_tipo -> nom = tipo_no_str_o_nom"); }
-                | nombre '=' tipo_estructurado {printf("\n  decl_tipo -> nom = tipo_str"); }
-;
+declaracion_tipo: nombre '=' tipo_no_estructurado_o_nombre_tipo ';' {printf("\n   declarac_tipo  ->  nom  =  tipo_no_estructurado_o_nombre"); }
+                | nombre '=' tipo_estructurado {printf("\n  declarac_tipo -> nom = tipo_estructurado");};
 
 declaracion_tipo_mas: declaracion_tipo
-                    | declaracion_tipo declaracion_tipo_mas
-;                    
+                    | declaracion_tipo declaracion_tipo_mas;                    
 
 tipo_no_estructurado_o_nombre_tipo: nombre;  
-                                  | tipo_escalar {printf("\n  tipo_no_str_o_nom -> tipo_escalar");}
-                                  | tipo_fichero {printf("\n  tipo_no_str_o_nom -> tipo_fichero");}
-                                  | tipo_enumerado {printf("\n  tipo_no_str_o_nom -> tipo_enumerado");}
-                                  | tipo_lista {printf("\n  tipo_no_str_o_nom -> tipo_lista");}
-                                  | tipo_lista_asociativa {printf("\n  tipo_no_str_o_nom -> tipo_lista_asociativa");}
-                                  | tipo_conjunto {printf("\n  tipo_no_str_o_nom -> tipo_conjunto");}
-;                                                                   
+                                  | tipo_escalar {printf("\n   tipo_no_estructurado_o_nombre  ->  tipo_escalar");}
+                                  | tipo_fichero {printf("\n   tipo_no_estructurado_o_nombre -> tipo_fichero");}
+                                  | tipo_enumerado {printf("\n   tipo_no_estructurado_o_nombre -> tipo_enumerado");}
+                                  | tipo_lista {printf("\n   tipo_no_estructurado_o_nombre -> tipo_lista");}
+                                  | tipo_lista_asociativa {printf("\n   tipo_no_estructurado_o_nombre -> tipo_lista_asociativa");}
+                                  | tipo_conjunto {printf("\n   tipo_no_estructurado_o_nombre -> tipo_conjunto");};                                                                   
 
-tipo_estructurado: tipo_registro {printf("tipo_str -> tipo_registro"); }
-;  /*Falta declaracion de clase */
+tipo_estructurado: tipo_registro {printf("tipo_estructurado -> tipo_registro");};  /*Falta declaracion de clase */
 
-tipo_escalar: ENTERO {printf("\n  tipo_escalar -> ENTERO");} 
-            | REAL {printf("\n  tipo_escalar -> REAL");} 
-            | BOOLEANO {printf("\n  tipo_escalar -> BOOLEANO");} 
-            | CARACTER {printf("\n  tipo_escalar -> CARACTER");}  
-            | CADENA {printf("\n  tipo_escalar -> CADENA");} 
+tipo_escalar: ENTERO {printf("\n   tipo_escalar  ->  ENTERO");} 
+            | REAL {printf("\n   tipo_escalar  ->  REAL");} 
+            | BOOLEANO {printf("\n   tipo_escalar -> BOOLEANO");} 
+            | CARACTER {printf("\n   tipo_escalar -> CARACTER");}  
+            | CADENA {printf("\n   tipo_escalar -> CADENA");} 
 ;            
 
-tipo_fichero: FICHERO {printf("\n  tipo_fichero -> FICHERO");} ;
+tipo_fichero: FICHERO {printf("\n   tipo_fichero -> FICHERO");} ;
 
 tipo_enumerado: '(' expresion_ctc_mas ')';
 
@@ -127,19 +123,19 @@ declaracion_campo_mas: declaracion_campo
 /* constantes, variables, interfaces */
 /*************************************/
 
-declaracion_constantes: CONSTANTE declaracion_constante_mas {printf("\n  decl_consts -> CONSTANTE decl_consts");} ;
+declaracion_constantes: CONSTANTE declaracion_constante_mas {printf("\n   decl_consts -> CONSTANTE declarac_consts");} ;
 
 declaracion_constante: nombre ':' tipo_no_estructurado_o_nombre_tipo '=' valor_constante ';' {printf("\n  decl_const -> nom : tipo_no_str_o_nom = valor_const"); } ; 
 
-declaracion_constante_mas: declaracion_constante {printf("\n  decl_consts -> decl_const"); }
+declaracion_constante_mas: declaracion_constante {printf("\n   decl_consts  ->  decl_const"); }
                          | declaracion_constante declaracion_constante_mas
 ;        
 
 /*Real shit*/
 valor_constante: expresion {printf("\n  valor_const -> expr"); }
-               | '[' valor_constante_mas ']' {printf("\n  valor_const -> '[' valor_consts ']'"); }
-               | '[' clave_valor_mas ']' {printf("\n  valor_const -> '[' clave_valores ']'"); }
-               | '[' campo_valor_mas ']' {printf("\n  valor_const -> '[' campo_valores ']'"); }
+               | '[' valor_constante_mas ']' {printf("\n  valor_const  ->  '[' valor_consts ']'"); }
+               | '[' clave_valor_mas ']' {printf("\n  valor_const  ->  '[' clave_valores ']'"); }
+               | '[' campo_valor_mas ']' {printf("\n  valor_const  ->  '[' campo_valores ']'"); }
 ;
 
 valor_constante_mas: valor_constante
@@ -174,129 +170,125 @@ declaracion_interfaces: INTERFAZ cabecera_subprograma_mas {printf("\n  decl_intf
 /* subprogramas */
 /****************/
 
-declaracion_subprograma: cabecera_subprograma bloque_subprograma {printf("\n  declr_subprg -> cab_subprg blq_subprg");} ;
+declaracion_subprograma: cabecera_subprograma bloque_subprograma {printf("\n  declarac_subprograma -> cabecera_subprograma bloque_subprograma");} ;
 
-cabecera_subprograma: cabecera_funcion {printf("\n  cab_subprg -> cab_func");}
-                    | cabecera_procedimiento {printf("\n  cab_subprg -> cab_proced");}
-                    | cabecera_constructor {printf("\n  cab_subprg -> cab_constr");}
-                    | cabecera_destructor {printf("\n  cab_subprg -> cab_destr");}
+cabecera_subprograma: cabecera_funcion {printf("\n  cabecera_subprograma -> cabevera_funcion");}
+                    | cabecera_procedimiento {printf("\n  cabecera_subprograma -> cabecera_procedimiento");}
+                    | cabecera_constructor {printf("\n  cabecera_subprograma -> cabecera_constructor");}
+                    | cabecera_destructor {printf("\n  cabecera_subprograma -> cabecera_destructor");}
 ;
 
-cabecera_subprograma_mas: cabecera_subprograma ';' {printf("\n  cabs_subprg -> cab_subprg");}
+cabecera_subprograma_mas: cabecera_subprograma ';' {printf("\n  cabecera_subprog -> cabecera_subprog");}
                         | cabecera_subprograma cabecera_subprograma_mas
 ;                        
 
-cabecera_funcion: FUNCION nombre FLECHA_DOBLE tipo_no_estructurado_o_nombre_tipo {printf("\n  cab_func -> FUNCION nom => tipo_no_str_o_nom"); }
-                | FUNCION nombre declaracion_parametros FLECHA_DOBLE tipo_no_estructurado_o_nombre_tipo {printf("\n  cab_func -> FUNCION nom decl_params => tipo_no_str_o_nom"); }
+
+cabecera_funcion: FUNCION nombre FLECHA_DOBLE tipo_no_estructurado_o_nombre_tipo {printf("\n  cabecera_funcion -> funcion nombre => tipo_no_estruc_o_nombre"); }
+                | FUNCION nombre declaracion_parametros FLECHA_DOBLE tipo_no_estructurado_o_nombre_tipo {printf("\n  cabecera_funcion -> funcion nom declaracion_paramametros => tipo_no_estruc_o_nom"); }
 ;         
 
-cabecera_procedimiento: PROCEDIMIENTO nombre {printf("\n  cab_proced -> PROCEDIMIENTO nom"); }
-                      | PROCEDIMIENTO nombre declaracion_parametros {printf("\n  cab_proced -> PROCEDIMIENTO nom decl_params"); }
+cabecera_procedimiento: PROCEDIMIENTO nombre {printf("\n  cabecera_procedimiento -> procedimiento_nom"); }
+                      | PROCEDIMIENTO nombre declaracion_parametros {printf("\n  cabecera_procedimiento -> procedimiento_nombre_declaracion_parametros"); }
 ;
 
-cabecera_constructor: CONSTRUCTOR nombre {printf("\n  cab_constr -> CONSTRUCTOR nom"); }
-                    | CONSTRUCTOR nombre declaracion_parametros {printf("\n  cab_constr -> CONSTRUCTOR nom decl_params"); }
+cabecera_constructor: CONSTRUCTOR nombre {printf("\n  cabecera_constructor -> constructor_nom"); }
+                    | CONSTRUCTOR nombre declaracion_parametros {printf("\n  cabecera_constructor -> constructor_nombre_declaracion_parametros"); }
 ;
 
-cabecera_destructor: DESTRUCTOR nombre {printf("\n  cab_destr -> DESTRUCTOR nom");} ;
+cabecera_destructor: DESTRUCTOR nombre {printf("\n  cabecera_destuctor -> destructor_nombre");} ;
 
-declaracion_parametros: '(' lista_parametros_formales ')' {printf("\n  decl_params -> list_params_form");};
+declaracion_parametros: '(' lista_parametros_formales ')' {printf("\n  declarac_parametro -> lista_parametro_formales");};
 
-lista_parametros_formales: parametros_formales {printf("\n  list_params_form -> params_form");} //Esta recursividad esta bien?? (definida asi en el pfd)
+lista_parametros_formales: parametros_formales {printf("\n  lista_parametros_formales -> paramametros_formales");} //Esta recursividad esta bien?? (definida asi en el pfd)
                          | lista_parametros_formales ';' parametros_formales
 ;
 
-parametros_formales: nombre_mas ':' tipo_no_estructurado_o_nombre_tipo {printf("\n  params_form -> nom : tipo_no_str_o_nom");}  //Uno o mas nombres revisar
-                   | nombre_mas ':' tipo_no_estructurado_o_nombre_tipo MODIFICABLE {printf("\n  params_form -> nom : tipo_no_str_o_nom MODIFICABLE");} 
+parametros_formales: nombre_mas ':' tipo_no_estructurado_o_nombre_tipo {printf("\n  parametros_formales -> nombre : tipo_no_estructurado_o_nombre");}  //Uno o mas nombres revisar
+                   | nombre_mas ':' tipo_no_estructurado_o_nombre_tipo MODIFICABLE {printf("\n  parametros_formales -> nombre : tipo_no_estructurado_o_nombre_modificable");} 
 ;       
 
 //Tambien puedo poner bloque subprogrma
-bloque_subprograma: bloque_instrucciones {printf("\n  blq_subprg -> blq_instr");}
-                  | declaracion_tipos bloque_instrucciones {printf("\n  blq_subprg -> decl_tip blq_instr");}
-                  | declaracion_constantes bloque_instrucciones {printf("\n  blq_subprg -> decl_const blq_instr");}
-                  | declaracion_variables bloque_instrucciones {printf("\n  blq_subprg -> decl_var blq_instr");}
-                  | declaracion_tipos declaracion_variables bloque_instrucciones {printf("\n  blq_subprg -> decl_tip decl_var blq_instr");}
-                  | declaracion_tipos declaracion_constantes bloque_instrucciones {printf("\n  blq_subprg -> decl_tip decl_const blq_instr");}
-                  | declaracion_constantes declaracion_variables bloque_instrucciones {printf("\n  blq_subprg -> decl_const decl_var blq_instr");}
-                  | declaracion_tipos declaracion_constantes declaracion_variables bloque_instrucciones {printf("\n  blq_subprg -> decl_tip decl_const decl_ var blq_instr");}
+bloque_subprograma: bloque_instrucciones {printf("\n  bloque_subprograma -> bloque_instrucion");}
+                  | declaracion_tipos bloque_instrucciones {printf("\n  bloque_subprograma -> declaracion_tipos_bloqque_instruccion");}
+                  | declaracion_constantes bloque_instrucciones {printf("\n  bloque_subprograma -> declarac_constantes_bloque_instrucion");}
+                  | declaracion_variables bloque_instrucciones {printf("\n  bloque_subprograma -> declaracion_variable_bloque_instrucion");}
+                  | declaracion_tipos declaracion_variables bloque_instrucciones {printf("\n  bloque_subprograma -> decl_tip declaracion_variable_bloque_instrucion");}
+                  | declaracion_tipos declaracion_constantes bloque_instrucciones {printf("\n  bloque_subprograma -> decl_tip declarac_constantes_bloque_instrucion");}
+                  | declaracion_constantes declaracion_variables bloque_instrucciones {printf("\n  bloque_subprograma -> declarac_constantes_declaracion_variable_bloque_instrucion");}
+                  | declaracion_tipos declaracion_constantes declaracion_variables bloque_instrucciones {printf("\n  bloque_subprograma -> declarac_tipo&declarac_const&declarac_variables&bloque_instrucciones");}
 ;          
-
 
 /*****************/
 /* instrucciones */
 /*****************/
 
-instruccion: ';' { printf("\n  instr -> ;");}
-           | instruccion_asignacion { printf("\n  instr -> instr_asig");}
-           | instruccion_salir { printf("\n  instr -> instr_salir");}
-           | instruccion_devolver { printf("\n  instr -> instr_devol");}
-           | instruccion_llamada { printf("\n  instr -> instr_llmda");}
-           | instruccion_si { printf("\n  instr -> instr_si");}
-           | instruccion_casos { printf("\n  instr -> instr_casos");}
-           | instruccion_bucle { printf("\n  instr -> instr_bucle"); }
-           | instruccion_probar_excepto { printf("\n  instr -> instr_exc");}
-           | instruccion_lanzar { printf("\n  instr -> instr_lanzar");};
+instruccion: ';' { printf("\n  instrucion -> ;");}
+           | instruccion_asignacion { printf("\n  instrucion -> instrucion_asignacion");}
+           | instruccion_salir { printf("\n  instrucion -> instrucion_salir");}
+           | instruccion_devolver { printf("\n  instrucion -> instrucion_devolver");}
+           | instruccion_llamada { printf("\n  instrucion -> instrucion_llamada");}
+           | instruccion_si { printf("\n  instrucion -> instruccion_si");}
+           | instruccion_casos { printf("\n  instrucion -> instrucion_casos");}
+           | instruccion_bucle { printf("\n  instrucion -> instruccion_bucle"); }
+           | instruccion_probar_excepto { printf("\n  instrucion -> instrucion_probar_excepto");}
+           | instruccion_lanzar { printf("\n  instrucion -> instrucion_lanzar");};
 
-instruccion_mas: instruccion { printf("\n  instrs -> instr");}
+instruccion_mas: instruccion { printf("\n  instrucion -> instruccion");}
                | instruccion instruccion_mas;
 
-instruccion_asignacion: objeto '=' expresion_ctc_cadena ';' {printf("\n  instr_asig -> objeto = expr_ctc_cadena"); }
-                      | objeto '=' expresion_ctc_caracter ';' {printf("\n  instr_asig -> objeto = expr_ctc_caracter"); }
-                      | objeto '=' expresion ';' {printf("\n  instr_asig -> objeto = expr"); };
+instruccion_asignacion: objeto '=' expresion ';' {printf("\n  instr_asignacion -> objeto = exp"); };
 
 
-instruccion_salir: SALIR ';' {printf("\n  instr_salir -> SALIR ;"); }
-                 | SALIR SI expresion {printf("\n  instr_salir -> SALIR SI expr ;"); };
+instruccion_salir: SALIR ';' {printf("\n  instrucion_salir -> salir"); }
+                 | SALIR SI expresion ';' {printf("\n  instrucion_salir -> salir_si_exp ;"); };
 
-instruccion_devolver: DEVOLVER ';' {printf("\n  instr_devol -> DEVOLVER"); }
-                    | DEVOLVER expresion ';' {printf("\n  instr_devol -> DEVOLVER expr"); };
+instruccion_devolver: DEVOLVER ';' {printf("\n  instrucion_devolver -> devolver"); }
+                    | DEVOLVER expresion ';' {printf("\n  instrucion_devol -> devolver_exp"); };
 
-instruccion_llamada: llamada_subprograma ';' {printf("\n  instr_llmda -> llmda_subprg"); } ;
+instruccion_llamada: llamada_subprograma ';' {printf("\n  instruccion_llamada -> llamada_subprograma"); } ;
 
-llamada_subprograma: nombre {printf("\n  llmda_subprg -> nom"); }
-                   | nombre '('                     ')' {printf("\n  llmda_subprg -> nom '('       ')' "); }
-                   | nombre '(' expresion_lista ')' {printf("\n  llmda_subprg -> nom '(' exprs ')' "); };
+llamada_subprograma: nombre {printf("\n  llamada_subprograma -> nombre"); }
+                   | nombre '(' ')' {printf("\n  llamada_subprograma -> nombre () "); }
+                   | nombre '(' expresion_lista ')' {printf("\n  llamada_subprograma -> nombre ( expression ) "); };
 
-instruccion_si: SI expresion ENTONCES bloque_instrucciones {printf("\n  instr_si -> SI expr ENTONCES blq_instr"); }
-              | SI expresion ENTONCES bloque_instrucciones SINO bloque_instrucciones {printf("\n  instr_si -> SI expr ENTONCES blq_instr"); }; 
+instruccion_si: SI expresion ENTONCES bloque_instrucciones {printf("\n  instruccion_si -> si_exp_entonces_bloque_instruccion"); }
+              | SI expresion ENTONCES bloque_instrucciones SINO bloque_instrucciones {printf("\n  instruccion_si -> si_exprresion_entonces_bloque_instrucion"); }; 
 
-instruccion_casos: EN CASO expresion SEA caso_mas';' {printf("\n  instr_casos -> EN CASO expr casos"); } ;
+instruccion_casos: EN CASO expresion SEA caso_mas';' {printf("\n  instruccion_casos -> en_caso_expresion_casos"); } ;
 
-caso: entradas FLECHA_DOBLE bloque_instrucciones {printf("\n  caso -> entradas => blq_instr"); } ; 
+caso: entradas FLECHA_DOBLE bloque_instrucciones {printf("\n  caso -> entradas => bloque_instrucion"); } ; 
 
-caso_mas: caso {printf("\n  casos -> caso"); } //Esto es necesario??? Es decir, es necesario imprimir algo en pantalla en casos recursivos
-        | caso caso_mas
-;   
+caso_mas: caso
+        | caso caso_mas;
 
 entradas: entrada //Falta esto aqui
-        | entrada '|' entradas
-;
+        | entrada '|' entradas;
 
-entrada: expresion {printf("\n  entrada -> expr"); }
+entrada: expresion {printf("\n  entrada -> expresion"); }
        | rango {printf("\n  entrada -> rango"); }
-       | OTRO {printf("\n  entrada -> OTRO"); }
-;
+       | OTRO {printf("\n  entrada -> OTRO"); };
 
-instruccion_bucle: clausula_iteracion bloque_instrucciones {printf("\n  instr_bucle -> claus_iter blq_instr"); } ;
 
-clausula_iteracion: PARA nombre EN objeto {printf("\n  claus_iter -> PARA nom EN objeto"); }
-                  | REPITE ELEMENTO nombre EN rango {printf("\n  claus_iter -> REPITE ELEMENTO nom EN rango"); } 
-                  | REPITE ELEMENTO nombre EN rango DESCENDENTE {printf("\n  claus_iter -> REPITE ELEMENTO nom EN rango DESCENDENTE"); }
-                  | MIENTRAS expresion {printf("\n  claus_iter -> MIENTRAS expr"); }
-                  | REPITE HASTA expresion {printf("\n  claus_iter -> REPITE HASTA expr"); }
+instruccion_bucle: clausula_iteracion bloque_instrucciones {printf("\n  instruccion_bucle -> clausula_iteracion&bloque_instruciones"); } ;
+
+clausula_iteracion: PARA nombre EN objeto {printf("\n  clausula_iteracion -> para_nombre_en_objeto"); }
+                  | REPITE ELEMENTO nombre EN rango {printf("\n  clausula_iteracion -> repite_elemento_nom_en_rango"); } 
+                  | REPITE ELEMENTO nombre EN rango DESCENDENTE {printf("\n  clausula_iteracion -> repite_elemento_nom_en_rango_descendente"); }
+                  | MIENTRAS expresion {printf("\n  clausula_iteracion -> mientras_espresion"); }
+                  | REPITE HASTA expresion {printf("\n  clausula_iteracion -> repite_hasta_expresion"); }
 ;   
 
-instruccion_probar_excepto: PROBAR bloque_instrucciones EXCEPTO clausula_excepcion_mas {printf("\n  instr_prob_exc -> PROBAR blq_instr EXCEPTO claus_excs"); }
-                          | PROBAR bloque_instrucciones EXCEPTO clausula_excepcion_mas FINALMENTE bloque_instrucciones {printf("\n  instr_prob_exc -> PROBAR blq_instr EXCEPTO claus_excs FINALMENTE blq_instr"); }
+instruccion_probar_excepto: PROBAR bloque_instrucciones EXCEPTO clausula_excepcion_mas {printf("\n  instrucion_probar_excepto -> probar_bloque_instrucion_excepto_clausula_excepcion_mas"); }
+                          | PROBAR bloque_instrucciones EXCEPTO clausula_excepcion_mas FINALMENTE bloque_instrucciones {printf("\n  instrucion_probar_excepto -> instrucion_probar_excepto -> probar_bloque_instrucion_excepto_clausula_excepcion_mas_finalmente_bloque_instrucion"); }
 ;                          
 
-clausula_excepcion: CUANDO nombre EJECUTA bloque_instrucciones {printf("\n  claus_exc -> CUANDO nom EJECUTA blq_instr"); } ;
+clausula_excepcion: CUANDO nombre EJECUTA bloque_instrucciones {printf("\n  clasula_ejecuta -> cuando_nombre_ejecuta_bloque_instrucion"); } ;
 
-clausula_excepcion_mas: clausula_excepcion {printf("\n  claus_excs -> claus_exc"); }
-                      | clausula_excepcion clausula_excepcion_mas
+clausula_excepcion_mas: clausula_excepcion {printf("\n  clausula_ejecutas -> clausula_excepcion"); }
+                      | clausula_excepcion clausula_excepcion_mas 
 ;                    
 
-instruccion_lanzar: LANZAR nombre ';' {printf("\n  instr_lanzar -> LANZAR nom"); } ; 
+instruccion_lanzar: LANZAR nombre ';' {printf("\n  instruccion_lanzar -> lanzar_nombre"); } ; 
 
 
 /***************/
@@ -333,7 +325,8 @@ expresiones_logicas: expresion '<' expresion { printf("\n expr -> menor que"); }
                    | expresion LEQ expresion { printf("\n expr -> menor o igual"); }
                    | expresion GEQ expresion { printf("\n expr -> mayor o igual"); }
                    | expresion AND expresion { printf("\n expr -> and"); }
-                   | expresion OR expresion { printf("\n expr -> or"); };
+                   | expresion OR expresion { printf("\n expr -> or"); }
+                   | expresion EQ expresion { printf("\n expr -> eq"); };
 
 /** expresiones binarias **/
 expresion_bin_and:expresion '&' expresion;
@@ -349,7 +342,18 @@ expresion: expresion_aritmetica
           | expresion_binaria
           | expresiones_logicas
           | expresion_numerica
-          | expresion_ctc_booleana;
+          | expresion_ctc_booleana
+          | expresion_ctc_caracter
+          | expresion_ctc_cadena
+          | IDENTIFICADOR
+          | '(' expresion_aritmetica ')'
+          | '(' expresion_binaria ')'
+          | '(' expresiones_logicas ')'
+          | '(' expresion_numerica ')'
+          | '(' expresion_ctc_booleana ')'
+          | '(' expresion_ctc_caracter ')'
+          | '(' expresion_ctc_cadena ')'
+          | '(' IDENTIFICADOR ')';
 
 /*expresion_mas: expresion
              | expresion expresion_mas ;
@@ -398,7 +402,6 @@ void yyerror(char *s) {
 }
 
 int yywrap() {
-  printf("\n");
   return(1);
 }
 
