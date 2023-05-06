@@ -324,7 +324,8 @@ expresion_resta: expresion_numerica '-' expresion_numerica
 expresion_suma: expresion_numerica '+' expresion_numerica
               | expresion '+' expresion_numerica;
 
-expresion: expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
+expresion: expresion_ctc 
+         | expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
          | expresion_division { printf("\n expr -> division"); }
          | expresion_modulo { printf("\n expr -> modulo"); }
          | expresion_resta { printf("\n expr -> resta"); }
