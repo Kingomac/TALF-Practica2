@@ -33,9 +33,17 @@
 /** Operadores unarios no asociativos **/
 /*%nonassoc '-' '!'*/
 
+%nonassoc '-'
+%left '+'
+%left '*' '/'
+%left '%'
+%left '^' '@'
+%left '&'
+%left '<' '>'
+%left LEQ GEQ NEQ
+%right AND OR
 
-
-%start instruccion_asignacion
+%start instruccion_salir
 
 %%
 
@@ -225,36 +233,32 @@ instruccion: ';' { printf("\n  instr -> ;");}
            | instruccion_llamada { printf("\n  instr -> instr_llmda");}
            | instruccion_si { printf("\n  instr -> instr_si");}
            | instruccion_casos { printf("\n  instr -> instr_casos");}
-           | instruccion_bucle { printf("\n  instr -> instr_bucle");}
+           | instruccion_bucle { printf("\n  instr -> instr_bucle"); }
            | instruccion_probar_excepto { printf("\n  instr -> instr_exc");}
-           | instruccion_lanzar { printf("\n  instr -> instr_lanzar");}
-;
+           | instruccion_lanzar { printf("\n  instr -> instr_lanzar");};
 
 instruccion_mas: instruccion { printf("\n  instrs -> instr");}
-               | instruccion instruccion_mas
-;        
+               | instruccion instruccion_mas;
 
-instruccion_asignacion: objeto '=' expresion ';' {printf("\n  instr_asig -> objeto = expr"); } ; 
+instruccion_asignacion: objeto '=' expresion_ctc_cadena ';' {printf("\n  instr_asig -> objeto = expr_ctc_cadena"); }
+                      | objeto '=' expresion_ctc_caracter ';' {printf("\n  instr_asig -> objeto = expr_ctc_caracter"); }
+                      | objeto '=' expresion ';' {printf("\n  instr_asig -> objeto = expr"); };
 
 
 instruccion_salir: SALIR ';' {printf("\n  instr_salir -> SALIR ;"); }
-                 | SALIR SI expresion {printf("\n  instr_salir -> SALIR SI expr ;"); }
-;                            
+                 | SALIR SI expresion {printf("\n  instr_salir -> SALIR SI expr ;"); };
 
 instruccion_devolver: DEVOLVER ';' {printf("\n  instr_devol -> DEVOLVER"); }
-                    | DEVOLVER expresion ';' {printf("\n  instr_devol -> DESVOLVER expr"); }
-;
+                    | DEVOLVER expresion ';' {printf("\n  instr_devol -> DEVOLVER expr"); };
 
 instruccion_llamada: llamada_subprograma ';' {printf("\n  instr_llmda -> llmda_subprg"); } ;
 
 llamada_subprograma: nombre {printf("\n  llmda_subprg -> nom"); }
                    | nombre '('                     ')' {printf("\n  llmda_subprg -> nom '('       ')' "); }
-                   | nombre '(' expresion_asterisco ')' {printf("\n  llmda_subprg -> nom '(' exprs ')' "); }
-;
+                   | nombre '(' expresion_lista ')' {printf("\n  llmda_subprg -> nom '(' exprs ')' "); };
 
 instruccion_si: SI expresion ENTONCES bloque_instrucciones {printf("\n  instr_si -> SI expr ENTONCES blq_instr"); }
-              | SI expresion ENTONCES bloque_instrucciones SINO bloque_instrucciones {printf("\n  instr_si -> SI expr ENTONCES blq_instr"); }
-;   
+              | SI expresion ENTONCES bloque_instrucciones SINO bloque_instrucciones {printf("\n  instr_si -> SI expr ENTONCES blq_instr"); }; 
 
 instruccion_casos: EN CASO expresion SEA caso_mas';' {printf("\n  instr_casos -> EN CASO expr casos"); } ;
 
@@ -299,37 +303,53 @@ instruccion_lanzar: LANZAR nombre ';' {printf("\n  instr_lanzar -> LANZAR nom");
 /* expresiones */
 /***************/
 
+/** expresiones aritméticas **/
 expresion_negativa: '-' expresion_ctc_entera { printf("\n expr -> negativa"); };
 
 expresion_potencia: expresion_numerica POTENCIA expresion_ctc_entera { printf("\n expr -> potencia"); }
                   | expresion_numerica POTENCIA expresion_ctc_real { printf("\n expr -> potencia"); };
 
-expresion_numerica: expresion_negativa
-                  | expresion_potencia
-                  | expresion_ctc_entera
-                  | expresion_ctc_real;
+expresion_numerica: expresion_ctc_entera
+                  | expresion_ctc_real
+                  | expresion_negativa
+                  | expresion_potencia;
 
-expresion_multiplicacion: expresion_numerica '*' expresion_numerica
-                        | expresion '*' expresion_numerica;
+expresion_multiplicacion: expresion '*' expresion;
+expresion_division: expresion '/' expresion;
+expresion_modulo: expresion '%' expresion;
+expresion_resta: expresion '-' expresion;
+expresion_suma: expresion '+' expresion;
 
-expresion_division: expresion_numerica '/' expresion_numerica
-                  | expresion '/' expresion_numerica;
-
-expresion_modulo: expresion_numerica '%' expresion_numerica
-                | expresion '%' expresion_numerica;
-
-expresion_resta: expresion_numerica '-' expresion_numerica
-                | expresion '-' expresion_numerica;
-
-expresion_suma: expresion_numerica '+' expresion_numerica
-              | expresion '+' expresion_numerica;
-
-expresion: expresion_ctc 
-         | expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
+expresion_aritmetica: expresion_multiplicacion { printf("\n expr -> multiplicacion"); }
          | expresion_division { printf("\n expr -> division"); }
          | expresion_modulo { printf("\n expr -> modulo"); }
          | expresion_resta { printf("\n expr -> resta"); }
          | expresion_suma { printf("\n expr -> suma"); };
+
+/** expresiones lógicas **/
+expresiones_logicas: expresion '<' expresion { printf("\n expr -> menor que"); }
+                   | expresion '>' expresion { printf("\n expr -> mayor que"); }
+                   | expresion NEQ expresion { printf("\n expr -> distinto"); }
+                   | expresion LEQ expresion { printf("\n expr -> menor o igual"); }
+                   | expresion GEQ expresion { printf("\n expr -> mayor o igual"); }
+                   | expresion AND expresion { printf("\n expr -> and"); }
+                   | expresion OR expresion { printf("\n expr -> or"); };
+
+/** expresiones binarias **/
+expresion_bin_and:expresion '&' expresion;
+expresion_bin_or: expresion '^' expresion;
+expresion_bin_xor: expresion '@' expresion;
+
+expresion_binaria: expresion_bin_and { printf("\n expr -> binaria and"); }
+                 | expresion_bin_or { printf("\n expr -> binaria or"); }
+                 | expresion_bin_xor { printf("\n expr -> binaria xor"); };
+
+
+expresion: expresion_aritmetica
+          | expresion_binaria
+          | expresiones_logicas
+          | expresion_numerica
+          | expresion_ctc_booleana;
 
 /*expresion_mas: expresion
              | expresion expresion_mas ;
@@ -342,9 +362,13 @@ expresion_asterisco: expresion
                    | expresion expresion_asterisco;
 
 expresion_ctc_entera: CTC_ENTERA { printf("\n expr_ctc -> CTC_ENTERA"); };
+
 expresion_ctc_real: CTC_REAL { printf("\n expr_ctc_real -> CTC_REAL"); };
+
 expresion_ctc_cadena: CTC_CADENA { printf("\n expr_ctc_cadena -> CTC_CADENA"); };
+
 expresion_ctc_caracter: CTC_CARACTER { printf("\n expr_ctc_caracter -> CTC_CARACTER"); };
+
 expresion_ctc_booleana: CTC_BOOLEANA { printf("\n expr_ctc_booleana -> CTC_BOOLEANA"); };
 
 expresion_ctc: expresion_ctc_entera
@@ -388,4 +412,5 @@ int main(int argc, char *argv[]) {
     yyin = fopen(argv[1],"r");
     yyparse();
   }
+  printf("\n\n");
 }
