@@ -33,17 +33,14 @@
 /** Operadores unarios no asociativos **/
 /*%nonassoc '-' '!'*/
 
-%right AND OR
-%left LEQ GEQ NEQ EQ
+%left EQ NEQ
+%left '<' '>'
+%left '+' '-'
+%left '*' '/' '%'
 %left '^' '@'
 %left '&'
-%left '<' '>'
-%nonassoc '-'
-%left '+'
-%left '*' '/'
-%left '%'
-
-%start programa
+%right AND OR
+%start expresion
 
 %%
 
@@ -64,68 +61,68 @@ nombre: IDENTIFICADOR                    { printf("\n  nombre_decl -> IDENTIFICA
 nombre_lista: nombre  
             | nombre ',' nombre_lista;
 
-bloque_programa:                                                                                   bloque_instrucciones
-               | declaracion_cargas                                                                bloque_instrucciones
-               |                    declaracion_tipos                                              bloque_instrucciones
-               | declaracion_cargas declaracion_tipos                                              bloque_instrucciones
-               |                                      declaracion_constantes                       bloque_instrucciones
-               | declaracion_cargas                   declaracion_constantes                       bloque_instrucciones
-               |                    declaracion_tipos declaracion_constantes                       bloque_instrucciones
-               | declaracion_cargas declaracion_tipos declaracion_constantes                       bloque_instrucciones
-               |                                                             declaracion_variables bloque_instrucciones
-               | declaracion_cargas                   declaracion_variables                        bloque_instrucciones
-               |                    declaracion_tipos declaracion_variables                        bloque_instrucciones
-               | declaracion_cargas declaracion_tipos  declaracion_variables bloque_instrucciones
-               | declaracion_constantes declaracion_variables bloque_instrucciones
-               | declaracion_cargas  declaracion_constantes declaracion_variables bloque_instrucciones
-               | declaracion_tipos declaracion_constantes declaracion_variables bloque_instrucciones
-               | declaracion_cargas declaracion_tipos declaracion_constantes declaracion_variables bloque_instrucciones;
+bloque_programa:                                                                                   bloque_instrucciones { printf("\n bloque_programa -> '{' bloq_instruc'}'");}
+               | declaracion_cargas                                                                bloque_instrucciones { printf("\n bloque_programa -> '{' declaracion_cargas bloq_instruc'}'");}
+               |                    declaracion_tipos                                              bloque_instrucciones { printf("\n bloque_programa -> '{' declarac_tipos bloq_instruc'}'");}
+               | declaracion_cargas declaracion_tipos                                              bloque_instrucciones { printf("\n bloque_programa -> '{' declaracion_cargas declarac_tipos bloq_instruc'}'");}
+               |                                      declaracion_constantes                       bloque_instrucciones { printf("\n bloque_programa -> '{' declarac_const bloq_instruc'}'");}
+               | declaracion_cargas                   declaracion_constantes                       bloque_instrucciones { printf("\n bloque_programa -> '{' declaracion_cargas declarac_const bloq_instruc'}'");}
+               |                    declaracion_tipos declaracion_constantes                       bloque_instrucciones { printf("\n bloque_programa -> '{' declarac_tipos declarac_const bloq_instruc'}'");}
+               | declaracion_cargas declaracion_tipos declaracion_constantes                       bloque_instrucciones { printf("\n bloque_programa -> '{' declaracion_cargas declarac_tipos declarac_const bloq_instruc'}'");}
+               |                                                             declaracion_variables bloque_instrucciones { printf("\n bloque_programa -> '{' declarac_var bloq_instruc'}'");}
+               | declaracion_cargas                                          declaracion_variables bloque_instrucciones { printf("\n bloque_programa -> '{' declaracion_cargas declarac_var bloq_instruc'}'");}
+               |                    declaracion_tipos                        declaracion_variables bloque_instrucciones { printf("\n bloque_programa -> '{' declarac_tipos declarac_var bloq_instruc'}'");}
+               | declaracion_cargas declaracion_tipos                        declaracion_variables bloque_instrucciones { printf("\n bloque_programa -> '{' declaracion_cargas declarac_tipos declarac_var bloq_instruc'}'");}
+               |                                      declaracion_constantes declaracion_variables bloque_instrucciones { printf("\n bloque_programa -> '{' declarac_tipos declarac_const declarac_var bloq_instruc'}'");}
+               | declaracion_cargas                   declaracion_constantes declaracion_variables bloque_instrucciones { printf("\n bloque_programa -> '{' declaracion_cargas declarac_const declarac_var bloq_instruc'}'");}
+               |                    declaracion_tipos declaracion_constantes declaracion_variables bloque_instrucciones { printf("\n bloque_programa -> '{' declarac_tipos declarac_const declarac_var bloq_instruc'}'");}
+               | declaracion_cargas declaracion_tipos declaracion_constantes declaracion_variables bloque_instrucciones { printf("\n bloque_programa -> '{' declaracion_cargas declarac_tipos declarac_const declarac_var bloq_instruc'}'");};
 
 bloque_instrucciones: '{' instruccion_mas '}' { printf("\n   bloque_instruccion  ->  '{' instrucciones '}'");};
 
 definicion_paquete: PAQUETE nombre ';' seccion_cabecera seccion_cuerpo;
 
-seccion_cabecera: CABECERA      
-                | CABECERA declaracion_cargas     
-                | CABECERA  declaracion_tipos    
-                | CABECERA declaracion_cargas declaracion_tipos    
-                | CABECERA   declaracion_constantes   
-                | CABECERA declaracion_cargas  declaracion_constantes   
-                | CABECERA  declaracion_tipos declaracion_constantes   
-                | CABECERA declaracion_cargas declaracion_tipos declaracion_constantes   
-                | CABECERA    declaracion_variables  
-                | CABECERA declaracion_cargas   declaracion_variables  
-                | CABECERA  declaracion_tipos  declaracion_variables  
-                | CABECERA declaracion_cargas declaracion_tipos  declaracion_variables  
-                | CABECERA   declaracion_constantes declaracion_variables  
-                | CABECERA declaracion_cargas  declaracion_constantes declaracion_variables  
-                | CABECERA  declaracion_tipos declaracion_constantes declaracion_variables  
-                | CABECERA declaracion_cargas declaracion_tipos declaracion_constantes declaracion_variables  
-                | CABECERA     declaracion_interfaces 
-                | CABECERA declaracion_cargas    declaracion_interfaces 
-                | CABECERA  declaracion_tipos   declaracion_interfaces 
-                | CABECERA declaracion_cargas declaracion_tipos   declaracion_interfaces 
-                | CABECERA   declaracion_constantes  declaracion_interfaces 
-                | CABECERA declaracion_cargas  declaracion_constantes  declaracion_interfaces 
-                | CABECERA  declaracion_tipos declaracion_constantes  declaracion_interfaces 
-                | CABECERA declaracion_cargas declaracion_tipos declaracion_constantes  declaracion_interfaces 
-                | CABECERA    declaracion_variables declaracion_interfaces 
-                | CABECERA declaracion_cargas   declaracion_variables declaracion_interfaces 
-                | CABECERA  declaracion_tipos  declaracion_variables declaracion_interfaces 
-                | CABECERA declaracion_cargas declaracion_tipos  declaracion_variables declaracion_interfaces 
-                | CABECERA   declaracion_constantes declaracion_variables declaracion_interfaces 
-                | CABECERA declaracion_cargas  declaracion_constantes declaracion_variables declaracion_interfaces 
-                | CABECERA  declaracion_tipos declaracion_constantes declaracion_variables declaracion_interfaces 
-                | CABECERA declaracion_cargas declaracion_tipos declaracion_constantes declaracion_variables declaracion_interfaces;
+seccion_cabecera: CABECERA                                                                                                          { printf("\n CABECERA ");};
+                | CABECERA declaracion_cargas                                                                                       { printf("\n CABECERA -> '{' declarac_cargas'}'");}
+                | CABECERA                    declaracion_tipos                                                                     { printf("\n CABECERA -> '{' declarac_tipos'}'");}
+                | CABECERA declaracion_cargas declaracion_tipos                                                                     { printf("\n CABECERA -> '{' declarac_cargas declarac_tipos'}'");}
+                | CABECERA                                      declaracion_constantes                                              { printf("\n CABECERA -> '{' declarac_const'}'");}
+                | CABECERA declaracion_cargas                   declaracion_constantes                                              { printf("\n CABECERA -> '{' declarac_cargas declarac_const'}'");}
+                | CABECERA                    declaracion_tipos declaracion_constantes                                              { printf("\n CABECERA -> '{' declarac_tipos declarac_const '}'");}
+                | CABECERA declaracion_cargas declaracion_tipos declaracion_constantes                                              { printf("\n CABECERA -> '{' declarac_cargas declarac_tipos declarac_const'}'");}
+                | CABECERA                                                             declaracion_variables                        { printf("\n CABECERA -> '{' declarac_var'}'");}
+                | CABECERA declaracion_cargas                                          declaracion_variables                        { printf("\n CABECERA -> '{' declarac_cargas declarac_var'}'");}
+                | CABECERA                    declaracion_tipos                        declaracion_variables                        { printf("\n CABECERA -> '{' declarac_tipos declarac_var'}'");}
+                | CABECERA declaracion_cargas declaracion_tipos                        declaracion_variables                        { printf("\n CABECERA -> '{' declarac_cargas declarac_tipos declarac_var'}'");}
+                | CABECERA                                      declaracion_constantes declaracion_variables                        { printf("\n CABECERA -> '{' declarac_const declarac_var'}'");}
+                | CABECERA declaracion_cargas                   declaracion_constantes declaracion_variables                        { printf("\n CABECERA -> '{' declarac_cargas declarac_const declarac_var'}'");}
+                | CABECERA                    declaracion_tipos declaracion_constantes declaracion_variables                        { printf("\n CABECERA -> '{' declarac_tipos declarac_const declarac_var'}'");}
+                | CABECERA declaracion_cargas declaracion_tipos declaracion_constantes declaracion_variables                        { printf("\n CABECERA -> '{' declarac_cargas declarac_tipos declarac_const declarac_var'}'");};
+                | CABECERA                                                                                   declaracion_interfaces { printf("\n CABECERA -> '{' declarac_interf'}'");} 
+                | CABECERA declaracion_cargas                                                                declaracion_interfaces { printf("\n CABECERA -> '{' declarac_cargas declarac_interf'}'");}
+                | CABECERA                    declaracion_tipos                                              declaracion_interfaces { printf("\n CABECERA -> '{' declarac_tipos declarac_interf'}'");}
+                | CABECERA declaracion_cargas declaracion_tipos                                              declaracion_interfaces { printf("\n CABECERA -> '{' declarac_cargas declarac_tipos declarac_interf'}'");}
+                | CABECERA                                      declaracion_constantes                       declaracion_interfaces { printf("\n CABECERA -> '{' declarac_const declarac_interf'}'");}
+                | CABECERA declaracion_cargas                   declaracion_constantes                       declaracion_interfaces { printf("\n CABECERA -> '{' declarac_cargas declarac_const declarac_interf'}'");}
+                | CABECERA                    declaracion_tipos declaracion_constantes                       declaracion_interfaces { printf("\n CABECERA -> '{' declarac_tipos declarac_const  declarac_interf'}'");}
+                | CABECERA declaracion_cargas declaracion_tipos declaracion_constantes                       declaracion_interfaces { printf("\n CABECERA -> '{' declarac_cargas declarac_tipos declarac_const declarac_interf'}'");}
+                | CABECERA                                                             declaracion_variables declaracion_interfaces { printf("\n CABECERA -> '{' declarac_var declarac_interf'}'");}
+                | CABECERA declaracion_cargas                                          declaracion_variables declaracion_interfaces { printf("\n CABECERA -> '{' declarac_cargas declarac_var declarac_interf'}'");}
+                | CABECERA                    declaracion_tipos                        declaracion_variables declaracion_interfaces { printf("\n CABECERA -> '{' declarac_tipos declarac_var declarac_interf'}'");}
+                | CABECERA declaracion_cargas declaracion_tipos                        declaracion_variables declaracion_interfaces { printf("\n CABECERA -> '{' declarac_cargas declarac_tipos declarac_var declarac_interf'}'");}
+                | CABECERA                                      declaracion_constantes declaracion_variables declaracion_interfaces { printf("\n CABECERA -> '{' declarac_const declarac_var declarac_interf'}'");}
+                | CABECERA declaracion_cargas                   declaracion_constantes declaracion_variables declaracion_interfaces { printf("\n CABECERA -> '{' declarac_cargas declarac_const declarac_var declarac_interf'}'");}
+                | CABECERA                    declaracion_tipos declaracion_constantes declaracion_variables declaracion_interfaces { printf("\n CABECERA -> '{' declarac_tipos declarac_const declarac_var declarac_interf'}'");}
+                | CABECERA declaracion_cargas declaracion_tipos declaracion_constantes declaracion_variables declaracion_interfaces { printf("\n CABECERA -> '{' declarac_cargas declarac_tipos declarac_const declarac_var declarac_interf'}'");};
 
-seccion_cuerpo: CUERPO     declaracion_subprograma_mas
-              | CUERPO declaracion_tipos    declaracion_subprograma_mas
-              | CUERPO  declaracion_constantes   declaracion_subprograma_mas
-              | CUERPO declaracion_tipos declaracion_constantes   declaracion_subprograma_mas
-              | CUERPO   declaracion_variables  declaracion_subprograma_mas
-              | CUERPO declaracion_tipos  declaracion_variables  declaracion_subprograma_mas
-              | CUERPO  declaracion_constantes declaracion_variables  declaracion_subprograma_mas
-              | CUERPO declaracion_tipos declaracion_constantes declaracion_variables  declaracion_subprograma_mas;
+seccion_cuerpo: CUERPO                                                                 declaracion_subprograma_mas { printf("\n CUERPO -> '{' declarac_subrog'}'");}
+              | CUERPO declaracion_tipos                                               declaracion_subprograma_mas { printf("\n CUERPO -> '{' declarac_tipos declarac_subrog'}'");}
+              | CUERPO                   declaracion_constantes                        declaracion_subprograma_mas { printf("\n CUERPO -> '{' declarac_const declarac_subrog'}'");}
+              | CUERPO declaracion_tipos declaracion_constantes                        declaracion_subprograma_mas { printf("\n CUERPO -> '{' declarac_tipos declarac_const declarac_subrog'}'");}
+              | CUERPO                                          declaracion_variables  declaracion_subprograma_mas { printf("\n CUERPO -> '{' declarac_var declarac_subrog'}'");}
+              | CUERPO declaracion_tipos                        declaracion_variables  declaracion_subprograma_mas { printf("\n CUERPO -> '{' declarac_tipos declarac_var declarac_subrog'}'");}
+              | CUERPO                   declaracion_constantes declaracion_variables  declaracion_subprograma_mas { printf("\n CUERPO -> '{' declarac_const declarac_var declarac_subrog'}'");}
+              | CUERPO declaracion_tipos declaracion_constantes declaracion_variables  declaracion_subprograma_mas { printf("\n CUERPO -> '{' declarac_tipos declarac_const declarac_var declarac_subrog'}'");};
 
 declaracion_cargas: declaracion_carga_lista ';';
 
@@ -230,7 +227,7 @@ declaracion_variable : nombre_lista ':' tipo_no_estructurado_o_nombre_tipo ';'
 declaracion_variable_mas: declaracion_variable
                         | declaracion_variable declaracion_variable_mas;                      
 
-declaracion_interfaces: INTERFAZ cabecera_subprograma_mas {printf("\n  decl_intf -> INTERFAZ cabs_subprg"); } ;
+declaracion_interfaces: INTERFAZ cabecera_subprograma_mas ';' {printf("\n  decl_intf -> INTERFAZ cabs_subprg"); } ;
 
 /*************************/
 /* declaración de clases */
@@ -291,7 +288,7 @@ modificador: GENERICO
 
 declaracion_subprograma: cabecera_subprograma bloque_subprograma {printf("\n  declarac_subprograma -> cabecera_subprograma bloque_subprograma");} ;
 
-declaracion_subprograma_mas: declaracion_subprograma
+declaracion_subprograma_mas: declaracion_subprograma {printf("\n declaracion_subprograma");}
                            | declaracion_subprograma declaracion_subprograma_mas;
 
 cabecera_subprograma: cabecera_funcion       {printf("\n  cabecera_subprograma -> cabecera_funcion");}
@@ -299,8 +296,8 @@ cabecera_subprograma: cabecera_funcion       {printf("\n  cabecera_subprograma -
                     | cabecera_constructor   {printf("\n  cabecera_subprograma -> cabecera_constructor");}
                     | cabecera_destructor    {printf("\n  cabecera_subprograma -> cabecera_destructor");};
 
-cabecera_subprograma_mas: cabecera_subprograma ';' {printf("\n  cabecera_subprog -> cabecera_subprog");}
-                        | cabecera_subprograma cabecera_subprograma_mas;                        
+cabecera_subprograma_mas: cabecera_subprograma {printf("\n  cabecera_subprog -> cabecera_subprog");}
+                        | cabecera_subprograma ';' cabecera_subprograma_mas;                        
 
 
 cabecera_funcion: FUNCION nombre FLECHA_DOBLE tipo_no_estructurado_o_nombre_tipo                        {printf("\n  cabecera_funcion -> funcion nombre => tipo_no_estruc_o_nombre"); }
@@ -316,14 +313,14 @@ cabecera_destructor: DESTRUCTOR nombre {printf("\n  cabecera_destuctor -> destru
 
 declaracion_parametros: '(' lista_parametros_formales ')' {printf("\n  declarac_parametro -> lista_parametro_formales");};
 
-lista_parametros_formales: parametros_formales {printf("\n  lista_parametros_formales -> paramametros_formales");} //Esta recursividad esta bien?? (definida asi en el pfd)
+lista_parametros_formales: parametros_formales {printf("\n  lista_parametros_formales -> paramametros_formales");}
                          | lista_parametros_formales ';' parametros_formales;
 
-parametros_formales: nombre_lista ':' tipo_no_estructurado_o_nombre_tipo             {printf("\n  parametros_formales -> nombre : tipo_no_estructurado_o_nombre");}  //Uno o mas nombres revisar
+parametros_formales: nombre_lista ':' tipo_no_estructurado_o_nombre_tipo             {printf("\n  parametros_formales -> nombre : tipo_no_estructurado_o_nombre");}
                    | nombre_lista ':' tipo_no_estructurado_o_nombre_tipo MODIFICABLE {printf("\n  parametros_formales -> nombre : tipo_no_estructurado_o_nombre_modificable");} ;       
 
 //Tambien puedo poner bloque subprogrma
-bloque_subprograma:                                                                bloque_instrucciones {printf("\n  bloque_subprograma -> bloque_instrucion");}
+bloque_subprograma: bloque_instrucciones {printf("\n  bloque_subprograma -> bloque_instrucion");}
                   | declaracion_tipos                                              bloque_instrucciones {printf("\n  bloque_subprograma -> declaracion_tipos_bloqque_instruccion");}
                   |                   declaracion_constantes                       bloque_instrucciones {printf("\n  bloque_subprograma -> declarac_constantes_bloque_instrucion");}
                   |                                          declaracion_variables bloque_instrucciones {printf("\n  bloque_subprograma -> declaracion_variable_bloque_instrucion");}
@@ -464,7 +461,8 @@ expresion_binaria: expresion_bin_and { printf("\n expr -> binaria and"); }
                  | expresion_bin_or  { printf("\n expr -> binaria or"); }
                  | expresion_bin_xor { printf("\n expr -> binaria xor"); };
 
-expresion:      expresion_aritmetica
+expresion: expresion_primaria     
+          |     expresion_aritmetica
           |     expresion_binaria
           |     expresiones_logicas
           |     expresion_numerica
